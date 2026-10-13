@@ -1,0 +1,86 @@
+services:
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: archive
+      POSTGRES_USER: archive
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U archive -d archive"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  directus:
+    image: directus/directus:12.4.1
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:12001:8055"
+    environment:
+      SECRET: ${DIRECTUS_SECRET:?Set DIRECTUS_SECRET}
+      DB_CLIENT: pg
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_DATABASE: archive
+      DB_USER: archive
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
+      ACCESS_TOKEN_TTL: 8h
+      PUBLIC_URL: http://localhost:12001
+      CORS_ENABLED: "false"
+      CACHE_ENABLED: "false"
+      RATE_LIMITER_ENABLED: "true"
+      RATE_LIMITER_POINTS: 100
+      RATE_LIMITER_DURATION: 1
+      FILES_MAX_UPLOAD_SIZE: 30mb
+      STORAGE_LOCATIONS: local
+      STORAGE_LOCAL_ROOT: /directus/uploads
+    volumes:
+      - uploads:/directus/uploads
+  init:
+    build:
+      context: .
+      target: deps
+    profiles: [setup]
+    env_file: .env
+    environment:
+      DIRECTUS_URL: http://directus:8055
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./src/lib/schema.json:/app/src/lib/schema.json:ro
+      - ./public/openflights:/app/public/openflights
+      - ./.local:/app/.local
+    command: node scripts/bootstrap.mjs
+    depends_on: [directus]
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on: [directus]
+    ports:
+      - "127.0.0.1:12000:3000"
+    environment:
+      APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN}
+      DIRECTUS_URL: http://directus:8055
+      ARCHIVE_TOKEN: ${ARCHIVE_TOKEN:?Set ARCHIVE_TOKEN}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      TURNSTILE_MODE: ${TURNSTILE_MODE:-production}
+      TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    profiles: [tunnel]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on: [web]
+volumes:
+  database:
+  uploads:

@@ -1,0 +1,1 @@
+export const themeScript=`(()=>{try{const p=localStorage.getItem('archive-theme');document.documentElement.dataset.theme=p==='dark'||p!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch{document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}})();`;

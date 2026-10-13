@@ -1,0 +1,2 @@
+Date,Flight number,From,To,Dep time,Arr time,Arrival date,Duration,Airline,Registration,Seat number,Class,Status,Note
+2025-01-01,NH1,HND,CTS,09:00,10:30,2025-01-01,01:30,,,12A,Y,flown,
