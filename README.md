@@ -230,3 +230,21 @@ TURNSTILE_SECRET_KEY=発行されたシークレットキー
 ## サイトタイトルのユーザー名
 
 管理画面の「サイト設定」で公開ユーザー名（1〜50文字）を保存すると、ブラウザーのタイトルが `Aircraft Archive — ユーザー名` になります。ログイン情報とは別にDirectusの `site_settings` に保存されます。既存環境では更新前に `pnpm bootstrap` で設定コレクションを追加してください。未設定時は `Aircraft Archive` と表示します。
+
+## 本番環境の更新
+
+初回デプロイ済みのUbuntuで、リポジトリの所有ユーザーとして実行します。
+
+```bash
+./production-update.sh
+```
+
+初めてこのスクリプトを取り込む際は `git pull --ff-only origin main` を先に実行してください。実行権限がない場合は `bash production-update.sh` でも実行できます。Docker操作権限、Bash、Git、util-linuxのflockが必要です。
+
+処理順は、事前確認 → バックアップ → origin/mainのfast-forward更新 → web/initのビルド → bootstrapによる設定スキーマ反映 → Web再起動 → 内部HTTP確認です。手元で取得済みのコミットを配置する場合は `./production-update.sh --no-pull` を使えます。未コミット変更（マスター取込で更新されたpublic/openflightsのファイルを含む）がある場合は停止し、自動で破棄しません。
+
+バックアップは `.local/backups/日時-コミット/` にDBダンプ・画像原本・環境変数・Compose設定を保存します。`COMPLETE` があるものだけがバックアップ完了済みです。秘密情報を含むため公開せず、必要に応じて別媒体へ保管してください。空き容量を確保し、更新中は投稿・編集・インポートを控えてください。DBと画像は順番に取得するため、同時書き込み中の完全な整合性は保証しません。バックアップの自動削除は行いません。
+
+ビルド中は既存Webを維持し、入れ替え時には短時間停止します。失敗するとその時点で停止し、DBを自動復元しません。Git更新済み・スキーマ変更済みの段階で失敗する場合もあります。表示された工程と `docker compose logs --tail=100 web directus` を確認してください。
+
+DB・Directus・Tunnelは再作成・バージョン更新せず、空港などの外部データも再取込しません。これらのサービスやCompose設定の変更を伴うリリースは別途対応が必要です。内部HTTP確認後も、公開HTTPS URLでTurnstile・ログイン・編集を確認してください。
