@@ -24,9 +24,14 @@ trap 'printf "Update failed during: %s\nBackup: %s\nNo automatic database rollba
 [[ $(git branch --show-current) == main ]] || { echo 'Switch to main before updating.' >&2; exit 1; }
 [[ -z $(git status --porcelain) ]] || { echo 'Uncommitted files found. Commit or move them before updating; .env is ignored.' >&2; exit 1; }
 compose=(docker compose --project-directory "$PWD" --env-file "$PWD/.env" -f "$PWD/compose.yaml")
+step=compose-config
 "${compose[@]}" config --quiet
-"${compose[@]}" exec -T database pg_isready -U archive -d archive >/dev/null
-"${compose[@]}" exec -T directus node -e 'fetch("http://127.0.0.1:8055/server/health").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))'
+step=database-readiness
+"${compose[@]}" exec -T database pg_isready -U archive -d archive
+step=directus-liveness
+# Directus 12 requires authentication for /server/health. Check HTTP liveness
+# here; PostgreSQL is checked separately and bootstrap validates authenticated access.
+"${compose[@]}" exec -T directus node -e 'fetch("http://127.0.0.1:8055/server/ping",{signal:AbortSignal.timeout(10000)}).then(async r=>{if(!r.ok)throw new Error(`HTTP ${r.status}`);if((await r.text()).trim()!=="pong")throw new Error("Unexpected ping response");console.log("Directus ping OK")}).catch(e=>{console.error("Directus ping failed:",e.message);process.exit(1)})'
 previous=$(git rev-parse HEAD)
 step=backup
 mkdir -p .local/backups
