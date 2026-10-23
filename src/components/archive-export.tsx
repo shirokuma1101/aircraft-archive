@@ -13,11 +13,11 @@ export default function ArchiveExport() {
       setMessage('ファイルを書き出しました。');
     }catch(e){setError(e instanceof Error?e.message:'書き出せませんでした。');}finally{setBusy('');}
   }
-  return <section className="export-panel panel"><h2>登録データをエクスポート</h2>
-    <h2>フライト履歴（CSV）</h2><p className="form-help">搭乗予定・搭乗済み・欠航・未搭乗を含む全フライトを出力します。予定・実績日時は各空港の現地時刻とUTCオフセット付きです。空港、航空会社、機種、機体番号、座席、クラス、メモを含みます。Excel向けのUTF-8形式です。</p>
+  return <section className="export-panel panel"><h2>エクスポート</h2><div className="export-options"><section>
+    <h3>フライト履歴</h3><p className="form-help">全フライト · CSV / UTF-8</p>
     <button className="button secondary" disabled={!!busy} onClick={()=>void download('csv')}>{busy==='csv'?'書き出し中…':'フライトCSVをダウンロード'}</button>
-    <h2>全登録データ（JSON）</h2><p className="form-help">フライト・空港・航空会社・機種・機体・機体履歴・写真情報・カテゴリーをIDと関連付けを保って保存します。非公開写真の登録情報も含みます。画像ファイル自体と管理者アカウントは含みません。JSONの自動復元機能は未対応です。</p>
+    </section><section><h3>全登録データ</h3><p className="form-help">非公開写真の情報を含みます。画像原本・アカウントは対象外。自動復元は未対応です。</p>
     <button className="button secondary" disabled={!!busy} onClick={()=>void download('json')}>{busy==='json'?'書き出し中…':'全データJSONをダウンロード'}</button>
-    {error&&<p className="form-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
+    </section></div>{error&&<p className="form-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
   </section>;
 }

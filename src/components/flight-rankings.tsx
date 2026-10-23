@@ -19,5 +19,5 @@ function RankingCard({ranking}:{ranking:Ranking}) {
 }
 export default function FlightRankings({data,flights}:{data:Archive;flights:Row[]}) {
   const rankings=flightRankings(data,flights);
-  return <section aria-labelledby="rankings-title"><div className="section-heading"><h2 id="rankings-title">ランキング</h2><span className="ranking-scope">現在の絞り込み条件・搭乗済み {flights.filter(f=>f.status==='flown').length}件</span></div><p className="ranking-help">未登録の項目は集計対象外です。同じ回数は同順位で表示します。</p><div className="ranking-grid">{rankings.map(r=><RankingCard key={r.key} ranking={r}/>)}</div></section>;
+  return <section aria-labelledby="rankings-title"><div className="section-heading"><h2 id="rankings-title">ランキング</h2><span className="ranking-scope">搭乗済み {flights.filter(f=>f.status==='flown').length}件</span></div><div className="ranking-grid">{rankings.map(r=><RankingCard key={r.key} ranking={r}/>)}</div></section>;
 }

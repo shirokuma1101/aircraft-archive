@@ -103,3 +103,6 @@ html[data-theme="dark"] .page .flight-map.leaflet-container{background:#111d30}h
 .theme-toggle{width:36px;height:36px}html[data-theme="dark"] .brand-icon{color:#a5f3fc}
 
 .manage-tabs{display:flex;gap:8px;border-bottom:1px solid var(--line);margin-bottom:28px;overflow-x:auto}.manage-tabs a{flex-shrink:0;padding:12px 16px;border-bottom:2px solid transparent;font-size:13px;color:var(--muted)}.manage-tabs a[aria-current=page]{color:var(--green);border-color:var(--green);font-weight:600}.manage-tabs a:hover{color:var(--green)}.settings-embed-link{margin-top:16px}@media(max-width:650px){.manage-tabs{gap:0;margin-bottom:22px}.manage-tabs a{font-size:11px;padding:10px 11px}}
+
+/* Let headings and grouped actions establish the page hierarchy. */
+.export-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:20px}.export-options>section{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:20px;border:1px solid var(--line);border-radius:12px}.export-options .button{margin-top:auto}.export-options .form-help{margin:0}.page-heading h1{margin:0}@media(max-width:650px){.export-options{grid-template-columns:1fr;gap:12px}}

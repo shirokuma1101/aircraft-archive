@@ -41,7 +41,7 @@ export default function Login() {
     const timeout=setTimeout(()=>setChallengeError('認証の読み込みに時間がかかっています。接続を確認して再読み込みしてください。'),20000);
     return ()=>clearTimeout(timeout);
   },[ready]);
-  return <main className="page narrow"><p className="eyebrow">FOR THE ARCHIVIST</p><h1>管理者ログイン</h1>
+  return <main className="page narrow"><h1>管理者ログイン</h1>
     {config&&<Script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" onReady={()=>setReady(true)} onError={()=>setChallengeError('認証を読み込めませんでした。接続を確認して再読み込みしてください。')}/>}
     <form className="panel login-form" onSubmit={async e=>{
       e.preventDefault();if(!token||busy)return;setBusy(true);setError('');
@@ -61,6 +61,6 @@ export default function Login() {
       {challengeError&&<div><p className="form-error" role="alert">{challengeError}</p><button type="button" className="button secondary" onClick={()=>{setToken('');setChallengeError('');if(widget.current!==undefined)window.turnstile?.reset(widget.current);else window.location.reload();}}>再認証</button></div>}
       {error&&<p className="form-error" role="alert">{error}</p>}
       <button className="button" disabled={busy||!token}>{busy?'ログイン中…':'ログイン'}<ArrowRight size={17}/></button>
-      <p className="form-help">閲覧にはログイン不要です。新規ユーザー登録は受け付けていません。</p>
+
     </form></main>;
 }

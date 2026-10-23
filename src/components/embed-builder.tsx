@@ -12,9 +12,9 @@ export default function EmbedBuilder() {
     <label>配色<select value={theme} onChange={e=>setTheme(e.target.value)}><option value="light">ライト</option><option value="dark">ダーク</option></select></label>
     <label>対象年<input type="text" inputMode="numeric" placeholder="空欄ですべての年" maxLength={4} value={year} onChange={e=>setYear(e.target.value)}/></label>
     <label>公開サイトURL<input type="url" value={base} onChange={e=>setBase(e.target.value)}/></label>
-  </div><p className="form-help">外部サイトで使う場合は、Cloudflare Tunnelなどで公開したURLを指定してください。localhostは他の端末から閲覧できません。公開済みの搭乗実績を表示し、再読み込み時に最新データを取得します。</p>
+  </div><p className="form-help">外部からアクセスできるURLを指定してください。</p>
     <h2>プレビュー</h2>{preview&&<iframe className="embed-preview" src={preview} title="埋め込みプレビュー" height={embedDesigns[design].height}/>}
-    <h2>埋め込みコード</h2><p className="form-help">貼り付け先のHTML欄にコピーしてください。iframeに対応しているサイトで利用できます。高さは必要に応じて調整できます。</p>
+    <h2>埋め込みコード</h2><p className="form-help">iframe対応のHTML欄に貼り付けてください。</p>
     <textarea aria-label="埋め込みコード" readOnly rows={5} value={code}/><button className="button" disabled={!code} onClick={async()=>{try{await navigator.clipboard.writeText(code);setMessage('コピーしました。');}catch{setMessage('コード欄を選択してコピーしてください。');}}}>コードをコピー</button>
     {error&&<p className="form-error" role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
   </section>;

@@ -29,9 +29,9 @@ export default function FlightImport({data}:{data:Archive}) {
   }
   function timestamp(value:string,airportId:string) {const zone=data.airports.find(a=>a.id===airportId)?.timezone||'UTC';return `${formatInTimeZone(value,zone,'yyyy-MM-dd HH:mm')} (${zone})`;}
   return <section className="panel flight-import" aria-label="フライトCSVインポート"><h2>フライトをインポート</h2>
-    <p>myFlightradar24・OpenFlightsのCSV、または列を割り当てたCSVを読み込みます（UTF-8・2MB・500件まで）。</p>
+    <p>myFlightradar24 / OpenFlights / 汎用CSV · UTF-8 · 2MB・500件まで</p>
     <p className="form-help"><a href="https://my.flightradar24.com/settings/export" target="_blank" rel="noreferrer">myFlightradar24からCSVを出力 ↗</a> · <a href="/flight-import-template.csv" download>汎用CSVテンプレート</a></p>
-    <p className="form-help">取り込んだフライトとメモは一般公開されます。空港は登録済みデータと照合します。時刻は各空港の現地時刻として扱います。myFlightradar24の搭乗済み記録は実際の日時、それ以外は予定日時に保存します。日付・時刻がない行は補完が必要です。</p>
+    <p className="form-help">フライトとメモは公開されます。</p><details className="import-mapping"><summary>日時・取込ルール</summary><p className="form-help">時刻は各空港の現地時刻。myFlightradar24の搭乗済み記録は実績、それ以外は予定として保存します。日付・時刻のない行は補完が必要です。空港は登録済みデータと照合します。</p></details>
     <fieldset disabled={busy}>
       <div className="import-controls"><label>インポート元<select value={source} onChange={e=>{setSource(e.target.value);setDirty(true);}}><option value="auto">自動判別</option><option>myFlightradar24</option><option>OpenFlights</option><option value="CSV">汎用CSV</option></select></label><label>CSVファイル<input type="file" accept=".csv,text/csv" onChange={e=>{if(e.target.files?.[0])void load(e.target.files[0]);}}/></label><label>区切り文字<select value={delimiter} onChange={e=>{setDelimiter(e.target.value);setMapping(undefined);setOverrides({});setPreview(null);setDirty(true);}}><option value=",">カンマ</option><option value=";">セミコロン</option><option value={'\t'}>タブ</option></select></label></div>
       <details><summary>CSVを貼り付け・編集</summary><textarea aria-label="CSVデータ" rows={7} value={csv} onChange={e=>{setCsv(e.target.value);setOverrides({});setPreview(null);setMapping(undefined);setDirty(true);}}/></details>
