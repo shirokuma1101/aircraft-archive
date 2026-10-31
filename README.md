@@ -248,3 +248,21 @@ TURNSTILE_SECRET_KEY=発行されたシークレットキー
 ビルド中は既存Webを維持し、入れ替え時には短時間停止します。失敗するとその時点で停止し、DBを自動復元しません。Git更新済み・スキーマ変更済みの段階で失敗する場合もあります。表示された工程と `docker compose logs --tail=100 web directus` を確認してください。
 
 DB・Directus・Tunnelは再作成・バージョン更新せず、空港などの外部データも再取込しません。これらのサービスやCompose設定の変更を伴うリリースは別途対応が必要です。内部HTTP確認後も、公開HTTPS URLでTurnstile・ログイン・編集を確認してください。
+
+### Dockerイメージを含む更新
+
+`production-update.sh` が正常終了し、バックアップ先の `COMPLETE` を確認した後に実行します。更新中は投稿・編集を控えてください。
+
+```bash
+docker compose --profile tunnel pull database directus tunnel
+docker compose stop web directus
+docker compose up -d --no-deps --wait database
+docker compose up -d --no-deps directus
+# HTTP 200 / pongになるまで確認（Directusは起動時にDBマイグレーションを実行）
+docker compose exec -T directus node -e 'fetch("http://127.0.0.1:8055/server/ping",{signal:AbortSignal.timeout(10000)}).then(async r=>{console.log(r.status,await r.text());if(!r.ok)process.exit(1)}).catch(e=>{console.error(e.message);process.exit(1)})'
+docker compose --profile setup run --rm --no-deps init
+docker compose up -d --no-deps web
+docker compose --profile tunnel up -d --no-deps tunnel
+```
+
+各コマンドが成功してから次へ進みます。Tunnelを使わない環境では最後のコマンドとpull対象の `tunnel` を省略します。公開URLで表示・ログイン・編集を確認してください。Directus更新後のDBを旧イメージへ直接戻さず、必要な場合は更新前のDBと画像をセットで復元します。PostgreSQLは17系を継続し、メジャー更新は別途DB移行として扱います。Node.jsとpnpmのバージョンはDockerfileで固定しています。

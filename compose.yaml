@@ -14,7 +14,7 @@ services:
       timeout: 5s
       retries: 20
   directus:
-    image: directus/directus:12.4.1
+    image: directus/directus:12.6.0
     restart: unless-stopped
     depends_on:
       database:
@@ -74,7 +74,7 @@ services:
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
       TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
   tunnel:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:2026.10.7
     restart: unless-stopped
     profiles: [tunnel]
     command: tunnel --no-autoupdate run

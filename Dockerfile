@@ -1,6 +1,6 @@
-FROM node:24-alpine AS base
+FROM node:24.22.2-alpine AS base
 WORKDIR /app
-RUN npm install -g pnpm@11.19.0
+RUN npm install -g pnpm@11.28.10
 FROM base AS deps
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
@@ -8,7 +8,7 @@ FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pnpm build
-FROM node:24-alpine AS runner
+FROM node:24.22.2-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000
 COPY --from=build --chown=node:node /app/.next/standalone ./

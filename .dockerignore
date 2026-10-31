@@ -4,5 +4,6 @@ node_modules
 .env
 .env.*
 .local
+.codex-remote-attachments
 test-results
 playwright-report
